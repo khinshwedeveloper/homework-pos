@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>KS7 POS - Products</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+</head>
+
+
+<body class="bg-slate-100 text-slate-800">
+
+<div class="flex min-h-screen">
+
+
+<!-- SIDEBAR -->
+
+<aside
+    class="fixed left-0 top-0 z-30 flex h-screen w-20 flex-col items-center border-r bg-white py-5 shadow-sm">
+
+    <div
+        class="mb-8 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-xl font-bold text-white">
+
+        K
+
+    </div>
+
+
+    <nav class="flex flex-col gap-3">
+
+        <a
+            href="index.html"
+            class="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100">
+
+            ▦
+
+        </a>
+
+
+        <a
+            href="category.html"
+            class="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100">
+
+            ☷
+
+        </a>
+
+
+        <a
+            href="product.html"
+            class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white">
+
+            ▤
+
+        </a>
+
+
+        <a
+            href="sales.html"
+            class="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100">
+
+            ▧
+
+        </a>
+
+
+        <a
+            href="report.html"
+            class="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100">
+
+            ▥
+
+        </a>
+
+    </nav>
+
+
+    <div class="mt-auto text-xs text-slate-400">
+
+        KS7<br>POS
+
+    </div>
+
+</aside>
+
+
+
+<!-- MAIN -->
+
+<main class="ml-20 flex-1">
+
+
+<header
+    class="flex h-20 items-center justify-between border-b bg-white px-7">
+
+    <div>
+
+        <h1 class="text-xl font-bold">
+            Products
+        </h1>
+
+        <p class="text-sm text-slate-400">
+            Manage menu products and stock
+        </p>
+
+    </div>
+
+
+    <button
+        id="addBtn"
+        class="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700">
+
+        + Add Product
+
+    </button>
+
+</header>
+
+
+
+<section class="p-6">
+
+
+<div
+    class="mb-5 flex flex-col gap-3 md:flex-row">
+
+    <input
+        id="search"
+        type="text"
+        placeholder="Search product..."
+        class="flex-1 rounded-xl border-0 bg-white px-4 py-3 shadow-sm outline-none">
+
+
+    <select
+        id="filter"
+        class="rounded-xl border-0 bg-white px-4 py-3 shadow-sm">
+
+    </select>
+
+</div>
+
+
+
+<div
+    class="overflow-hidden rounded-2xl bg-white shadow-sm">
+
+    <div class="overflow-x-auto">
+
+        <table
+            class="w-full min-w-[800px]">
+
+            <thead
+                class="bg-slate-50 text-left text-sm text-slate-500">
+
+                <tr>
+
+                    <th class="p-4">
+                        Product
+                    </th>
+
+                    <th>
+                        Category
+                    </th>
+
+                    <th>
+                        Price
+                    </th>
+
+                    <th>
+                        Stock
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th class="p-4 text-right">
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="tbody">
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+
+
+<!-- MODAL -->
+
+<div
+    id="modal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4">
+
+    <div
+        class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+
+        <div
+            class="mb-5 flex justify-between">
+
+            <h2
+                id="title"
+                class="text-lg font-bold">
+
+                Add Product
+
+            </h2>
+
+
+            <button
+                id="close"
+                class="text-xl text-slate-400">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+
+        <div class="grid gap-3 sm:grid-cols-2">
+
+
+            <input
+                id="name"
+                placeholder="Product name"
+                class="rounded-xl border px-4 py-3 sm:col-span-2">
+
+
+            <select
+                id="category"
+                class="rounded-xl border px-4 py-3">
+            </select>
+
+
+            <input
+                id="price"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Price"
+                class="rounded-xl border px-4 py-3">
+
+
+            <input
+                id="stock"
+                type="number"
+                min="0"
+                placeholder="Stock"
+                class="rounded-xl border px-4 py-3">
+
+
+            <input
+                id="image"
+                placeholder="Emoji e.g. 🍔"
+                class="rounded-xl border px-4 py-3">
+
+        </div>
+
+
+
+        <div
+            class="mt-5 flex justify-end gap-2">
+
+            <button
+                id="cancel"
+                class="rounded-xl border px-4 py-2">
+
+                Cancel
+
+            </button>
+
+
+            <button
+                id="save"
+                class="rounded-xl bg-blue-600 px-5 py-2 font-semibold text-white">
+
+                Save
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+let products =
+    JSON.parse(
+        localStorage.getItem("ks7_products") || "[]"
+    );
+
+
+let categories =
+    JSON.parse(
+        localStorage.getItem("ks7_categories") || "[]"
+    );
+
+
+let editId = null;
+
+
+
+function money(number) {
+
+    return "$" + Number(number).toFixed(2);
+
+}
+
+
+
+function renderFilters() {
+
+    $("#filter").html(`
+
+        <option value="All">
+            All Categories
+        </option>
+
+        ${
+            categories.map(function (category) {
+
+                return `
+                    <option value="${category.name}">
+                        ${category.name}
+                    </option>
+                `;
+
+            }).join("")
+        }
+
+    `);
+
+
+    $("#category").html(
+
+        categories.map(function (category) {
+
+            return `
+                <option value="${category.name}">
+                    ${category.name}
+                </option>
+            `;
+
+        }).join("")
+
+    );
+
+}
+
+
+
+function renderProducts() {
+
+    let search =
+        $("#search").val().toLowerCase();
+
+
+    let filter =
+        $("#filter").val() || "All";
+
+
+    let list =
+        products.filter(function (product) {
+
+            return (
+
+                (
+                    filter === "All"
+                    ||
+                    product.category === filter
+                )
+
+                &&
+
+                product.name
+                    .toLowerCase()
+                    .includes(search)
+
+            );
+
+        });
+
+
+    $("#tbody").html(
+
+        list.map(function (product) {
+
+            return `
+
+                <tr
+                    class="border-t hover:bg-slate-50">
+
+                    <td class="p-4">
+
+                        <div
+                            class="flex items-center gap-3">
+
+                            <div
+                                class="flex h-11 w-11 items-center justify-center rounded-lg bg-slate-100 text-2xl">
+
+                                ${product.image || "🍽️"}
+
+                            </div>
+
+
+                            <div>
+
+                                <b>
+                                    ${product.name}
+                                </b>
+
+                                <p
+                                    class="text-xs text-slate-400">
+
+                                    SKU-${String(product.id).slice(-5)}
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </td>
+
+
+                    <td>
+                        ${product.category}
+                    </td>
+
+
+                    <td class="font-semibold">
+
+                        ${money(product.price)}
+
+                    </td>
+
+
+                    <td>
+                        ${product.stock}
+                    </td>
+
+
+                    <td>
+
+                        <span
+                            class="rounded-full px-3 py-1 text-xs font-semibold
+                            ${
+                                product.stock > 0
+                                ? "bg-green-50 text-green-600"
+                                : "bg-red-50 text-red-500"
+                            }">
+
+                            ${
+                                product.stock > 0
+                                ? "In Stock"
+                                : "Out of Stock"
+                            }
+
+                        </span>
+
+                    </td>
+
+
+                    <td class="p-4 text-right">
+
+                        <button
+                            onclick="editProduct(${product.id})"
+                            class="mr-2 rounded-lg bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-600">
+
+                            Edit
+
+                        </button>
+
+
+                        <button
+                            onclick="deleteProduct(${product.id})"
+                            class="rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-500">
+
+                            Delete
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }).join("")
+
+        ||
+
+        `
+
+        <tr>
+
+            <td
+                colspan="6"
+                class="p-10 text-center text-slate-400">
+
+                No products found.
+
+            </td>
+
+        </tr>
+
+        `
+
+    );
+
+}
+
+
+
+function openModal(product) {
+
+    editId =
+        product ? product.id : null;
+
+
+    $("#title").text(
+        editId
+            ? "Edit Product"
+            : "Add Product"
+    );
+
+
+    $("#name").val(
+        product ? product.name : ""
+    );
+
+
+    $("#category").val(
+        product
+            ? product.category
+            : categories[0]?.name
+    );
+
+
+    $("#price").val(
+        product ? product.price : ""
+    );
+
+
+    $("#stock").val(
+        product ? product.stock : ""
+    );
+
+
+    $("#image").val(
+        product
+            ? product.image
+            : "🍽️"
+    );
+
+
+    $("#modal")
+        .removeClass("hidden")
+        .addClass("flex");
+
+}
+
+
+
+function editProduct(id) {
+
+    let product =
+        products.find(function (product) {
+
+            return product.id === id;
+
+        });
+
+
+    openModal(product);
+
+}
+
+
+
+function deleteProduct(id) {
+
+    if (!confirm(
+        "Delete this product?"
+    )) {
+
+        return;
+
+    }
+
+
+    products =
+        products.filter(function (product) {
+
+            return product.id !== id;
+
+        });
+
+
+    localStorage.setItem(
+        "ks7_products",
+        JSON.stringify(products)
+    );
+
+
+    renderProducts();
+
+}
+
+
+
+$(document).ready(function () {
+
+    renderFilters();
+
+    renderProducts();
+
+
+    $("#search").on(
+        "input",
+        renderProducts
+    );
+
+
+    $("#filter").on(
+        "change",
+        renderProducts
+    );
+
+
+    $("#addBtn").click(function () {
+
+        openModal();
+
+    });
+
+
+    $("#close, #cancel").click(function () {
+
+        $("#modal")
+            .addClass("hidden")
+            .removeClass("flex");
+
+    });
+
+
+    $("#save").click(function () {
+
+        let name =
+            $("#name").val().trim();
+
+
+        let category =
+            $("#category").val();
+
+
+        let price =
+            Number($("#price").val());
+
+
+        let stock =
+            Number($("#stock").val());
+
+
+        let image =
+            $("#image").val().trim()
+            || "🍽️";
+
+
+        if (
+            !name
+            ||
+            !category
+            ||
+            price < 0
+            ||
+            stock < 0
+        ) {
+
+            alert(
+                "Please enter valid product information."
+            );
+
+            return;
+
+        }
+
+
+        let product = {
+
+            id:
+                editId || Date.now(),
+
+            name:
+
+                name,
+
+            category:
+
+                category,
+
+            price:
+
+                price,
+
+            stock:
+
+                stock,
+
+            image:
+
+                image
+
+        };
+
+
+        if (editId) {
+
+            products =
+                products.map(function (item) {
+
+                    return item.id === editId
+                        ? product
+                        : item;
+
+                });
+
+        } else {
+
+            products.push(product);
+
+        }
+
+
+        localStorage.setItem(
+            "ks7_products",
+            JSON.stringify(products)
+        );
+
+
+        $("#modal")
+            .addClass("hidden")
+            .removeClass("flex");
+
+
+        renderProducts();
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>

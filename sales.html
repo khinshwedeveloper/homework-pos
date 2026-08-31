@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>KS7 POS - Sales List</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+</head>
+
+
+<body class="bg-slate-100 text-slate-800">
+
+<div class="flex min-h-screen">
+
+
+<!-- SIDEBAR -->
+
+<aside
+    class="fixed left-0 top-0 z-30 flex h-screen w-20 flex-col items-center border-r bg-white py-5 shadow-sm">
+
+    <div
+        class="mb-8 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-xl font-bold text-white">
+
+        K
+
+    </div>
+
+
+    <nav class="flex flex-col gap-3">
+
+        <a
+            href="index.html"
+            class="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100">
+
+            ▦
+
+        </a>
+
+
+        <a
+            href="category.html"
+            class="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100">
+
+            ☷
+
+        </a>
+
+
+        <a
+            href="product.html"
+            class="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100">
+
+            ▤
+
+        </a>
+
+
+        <a
+            href="sales.html"
+            class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white">
+
+            ▧
+
+        </a>
+
+
+        <a
+            href="report.html"
+            class="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100">
+
+            ▥
+
+        </a>
+
+    </nav>
+
+
+    <div class="mt-auto text-xs text-slate-400">
+
+        KS7<br>POS
+
+    </div>
+
+</aside>
+
+
+
+<main class="ml-20 flex-1">
+
+
+<header
+    class="flex h-20 items-center border-b bg-white px-7">
+
+    <div>
+
+        <h1 class="text-xl font-bold">
+            Sales List
+        </h1>
+
+        <p class="text-sm text-slate-400">
+            View all completed sales
+        </p>
+
+    </div>
+
+</header>
+
+
+
+<section class="p-6">
+
+
+<div
+    class="mb-5 flex flex-col gap-3 md:flex-row">
+
+    <input
+        id="search"
+        type="text"
+        placeholder="Search invoice..."
+        class="flex-1 rounded-xl border-0 bg-white px-4 py-3 shadow-sm outline-none">
+
+
+    <input
+        id="date"
+        type="date"
+        class="rounded-xl border-0 bg-white px-4 py-3 shadow-sm outline-none">
+
+
+    <select
+        id="payment"
+        class="rounded-xl border-0 bg-white px-4 py-3 shadow-sm">
+
+        <option>
+            All Payment
+        </option>
+
+        <option>
+            Cash
+        </option>
+
+        <option>
+            Card
+        </option>
+
+        <option>
+            Mobile
+        </option>
+
+    </select>
+
+</div>
+
+
+
+<div
+    class="overflow-hidden rounded-2xl bg-white shadow-sm">
+
+    <div class="overflow-x-auto">
+
+        <table
+            class="w-full min-w-[800px]">
+
+            <thead
+                class="bg-slate-50 text-left text-sm text-slate-500">
+
+                <tr>
+
+                    <th class="p-4">
+                        Invoice
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Items
+                    </th>
+
+                    <th>
+                        Payment
+                    </th>
+
+                    <th>
+                        Total
+                    </th>
+
+                    <th class="p-4 text-right">
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="tbody">
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+
+
+<!-- DETAILS MODAL -->
+
+<div
+    id="detail"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4">
+
+    <div
+        class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+
+        <div
+            class="mb-4 flex justify-between">
+
+            <h2 class="text-lg font-bold">
+                Invoice Details
+            </h2>
+
+            <button id="close">
+                ×
+            </button>
+
+        </div>
+
+
+        <div id="detailBody">
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<script>
+
+let sales =
+    JSON.parse(
+        localStorage.getItem("ks7_sales") || "[]"
+    );
+
+
+
+function money(number) {
+
+    return "$" + Number(number).toFixed(2);
+
+}
+
+
+
+function renderSales() {
+
+    let search =
+        $("#search").val().toLowerCase();
+
+
+    let date =
+        $("#date").val();
+
+
+    let payment =
+        $("#payment").val();
+
+
+    let list =
+        sales.filter(function (sale) {
+
+            return (
+
+                (
+                    !search
+                    ||
+                    sale.id
+                        .toLowerCase()
+                        .includes(search)
+                )
+
+                &&
+
+                (
+                    !date
+                    ||
+                    sale.date.slice(0, 10) === date
+                )
+
+                &&
+
+                (
+                    payment === "All Payment"
+                    ||
+                    sale.payment === payment
+                )
+
+            );
+
+        });
+
+
+    $("#tbody").html(
+
+        list.map(function (sale) {
+
+            let itemCount =
+                sale.items.reduce(
+                    function (total, item) {
+
+                        return total + item.qty;
+
+                    },
+                    0
+                );
+
+
+            return `
+
+                <tr
+                    class="border-t hover:bg-slate-50">
+
+                    <td
+                        class="p-4 font-semibold text-blue-600">
+
+                        ${sale.id}
+
+                    </td>
+
+
+                    <td>
+
+                        ${new Date(
+                            sale.date
+                        ).toLocaleString()}
+
+                    </td>
+
+
+                    <td>
+
+                        ${itemCount}
+                        item(s)
+
+                    </td>
+
+
+                    <td>
+
+                        <span
+                            class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
+
+                            ${sale.payment}
+
+                        </span>
+
+                    </td>
+
+
+                    <td class="font-bold">
+
+                        ${money(sale.total)}
+
+                    </td>
+
+
+                    <td class="p-4 text-right">
+
+                        <button
+                            onclick="viewSale('${sale.id}')"
+                            class="rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold">
+
+                            View
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }).join("")
+
+        ||
+
+        `
+
+        <tr>
+
+            <td
+                colspan="6"
+                class="p-10 text-center text-slate-400">
+
+                No sales found.
+
+            </td>
+
+        </tr>
+
+        `
+
+    );
+
+}
+
+
+
+function viewSale(id) {
+
+    let sale =
+        sales.find(function (sale) {
+
+            return sale.id === id;
+
+        });
+
+
+    $("#detailBody").html(`
+
+        <p
+            class="mb-4 text-sm text-slate-500">
+
+            ${sale.id}
+            ·
+            ${new Date(
+                sale.date
+            ).toLocaleString()}
+
+        </p>
+
+
+        <div
+            class="space-y-2 border-b pb-4">
+
+            ${
+                sale.items.map(function (item) {
+
+                    return `
+
+                        <div
+                            class="flex justify-between">
+
+                            <span>
+
+                                ${item.name}
+                                ×
+                                ${item.qty}
+
+                            </span>
+
+                            <b>
+
+                                ${money(
+                                    item.price * item.qty
+                                )}
+
+                            </b>
+
+                        </div>
+
+                    `;
+
+                }).join("")
+            }
+
+        </div>
+
+
+        <div
+            class="mt-4 space-y-1 text-sm">
+
+            <div class="flex justify-between">
+
+                <span>
+                    Subtotal
+                </span>
+
+                <b>
+                    ${money(sale.subtotal)}
+                </b>
+
+            </div>
+
+
+            <div class="flex justify-between">
+
+                <span>
+                    Tax
+                </span>
+
+                <b>
+                    ${money(sale.tax)}
+                </b>
+
+            </div>
+
+
+            <div
+                class="flex justify-between text-lg font-bold">
+
+                <span>
+                    Total
+                </span>
+
+                <b class="text-blue-600">
+
+                    ${money(sale.total)}
+
+                </b>
+
+            </div>
+
+        </div>
+
+    `);
+
+
+    $("#detail")
+        .removeClass("hidden")
+        .addClass("flex");
+
+}
+
+
+
+$(document).ready(function () {
+
+    renderSales();
+
+
+    $("#search, #date, #payment").on(
+        "input change",
+        renderSales
+    );
+
+
+    $("#close").click(function () {
+
+        $("#detail")
+            .addClass("hidden")
+            .removeClass("flex");
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>

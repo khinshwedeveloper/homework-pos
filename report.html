@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>KS7 POS - Sales Report</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+</head>
+
+
+<body class="bg-slate-100 text-slate-800">
+
+<div class="flex min-h-screen">
+
+
+<!-- SIDEBAR -->
+
+<aside
+    class="fixed left-0 top-0 z-30 flex h-screen w-20 flex-col items-center border-r bg-white py-5 shadow-sm">
+
+    <div
+        class="mb-8 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-xl font-bold text-white">
+
+        K
+
+    </div>
+
+
+    <nav class="flex flex-col gap-3">
+
+        <a
+            href="index.html"
+            class="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100">
+
+            ▦
+
+        </a>
+
+
+        <a
+            href="category.html"
+            class="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100">
+
+            ☷
+
+        </a>
+
+
+        <a
+            href="product.html"
+            class="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100">
+
+            ▤
+
+        </a>
+
+
+        <a
+            href="sales.html"
+            class="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100">
+
+            ▧
+
+        </a>
+
+
+        <a
+            href="report.html"
+            class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white">
+
+            ▥
+
+        </a>
+
+    </nav>
+
+
+    <div class="mt-auto text-xs text-slate-400">
+
+        KS7<br>POS
+
+    </div>
+
+</aside>
+
+
+
+<main class="ml-20 flex-1">
+
+
+<header
+    class="flex h-20 items-center justify-between border-b bg-white px-7">
+
+    <div>
+
+        <h1 class="text-xl font-bold">
+            Sales Report
+        </h1>
+
+        <p class="text-sm text-slate-400">
+            Analyze sales performance
+        </p>
+
+    </div>
+
+
+    <button
+        id="print"
+        class="rounded-xl border bg-white px-4 py-2 font-semibold hover:bg-slate-50">
+
+        Print Report
+
+    </button>
+
+</header>
+
+
+
+<section class="p-6">
+
+
+<!-- DATE FILTER -->
+
+<div
+    class="mb-5 flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm sm:flex-row sm:items-end">
+
+    <div>
+
+        <label
+            class="mb-1 block text-xs text-slate-400">
+
+            From
+
+        </label>
+
+        <input
+            id="from"
+            type="date"
+            class="rounded-xl border px-4 py-2">
+
+    </div>
+
+
+    <div>
+
+        <label
+            class="mb-1 block text-xs text-slate-400">
+
+            To
+
+        </label>
+
+        <input
+            id="to"
+            type="date"
+            class="rounded-xl border px-4 py-2">
+
+    </div>
+
+
+    <button
+        id="today"
+        class="rounded-xl bg-blue-600 px-5 py-2 font-semibold text-white">
+
+        Today
+
+    </button>
+
+</div>
+
+
+
+<!-- SUMMARY CARDS -->
+
+<div
+    class="mb-5 grid grid-cols-1 gap-4 md:grid-cols-3">
+
+
+    <div
+        class="rounded-2xl bg-white p-5 shadow-sm">
+
+        <p class="text-sm text-slate-400">
+            Total Sales
+        </p>
+
+        <h2
+            id="totalSales"
+            class="mt-2 text-2xl font-bold">
+
+            $0.00
+
+        </h2>
+
+    </div>
+
+
+    <div
+        class="rounded-2xl bg-white p-5 shadow-sm">
+
+        <p class="text-sm text-slate-400">
+            Orders
+        </p>
+
+        <h2
+            id="orders"
+            class="mt-2 text-2xl font-bold">
+
+            0
+
+        </h2>
+
+    </div>
+
+
+    <div
+        class="rounded-2xl bg-white p-5 shadow-sm">
+
+        <p class="text-sm text-slate-400">
+            Average Order
+        </p>
+
+        <h2
+            id="average"
+            class="mt-2 text-2xl font-bold">
+
+            $0.00
+
+        </h2>
+
+    </div>
+
+</div>
+
+
+
+<!-- REPORT -->
+
+<div class="grid gap-5 lg:grid-cols-2">
+
+
+    <!-- PAYMENT -->
+
+    <div
+        class="rounded-2xl bg-white p-5 shadow-sm">
+
+        <h2 class="mb-4 font-bold">
+            Payment Summary
+        </h2>
+
+
+        <div
+            id="payments"
+            class="space-y-4">
+        </div>
+
+    </div>
+
+
+
+    <!-- TOP PRODUCTS -->
+
+    <div
+        class="rounded-2xl bg-white p-5 shadow-sm">
+
+        <h2 class="mb-4 font-bold">
+            Top Products
+        </h2>
+
+
+        <div
+            id="topProducts"
+            class="space-y-3">
+        </div>
+
+    </div>
+
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+
+
+<script>
+
+function money(number) {
+
+    return "$" + Number(number).toFixed(2);
+
+}
+
+
+
+function generateReport() {
+
+    let sales =
+        JSON.parse(
+            localStorage.getItem("ks7_sales") || "[]"
+        );
+
+
+    let from =
+        $("#from").val();
+
+
+    let to =
+        $("#to").val();
+
+
+    if (from) {
+
+        sales =
+            sales.filter(function (sale) {
+
+                return sale.date.slice(0, 10) >= from;
+
+            });
+
+    }
+
+
+    if (to) {
+
+        sales =
+            sales.filter(function (sale) {
+
+                return sale.date.slice(0, 10) <= to;
+
+            });
+
+    }
+
+
+    let total =
+        sales.reduce(
+            function (sum, sale) {
+
+                return sum + sale.total;
+
+            },
+            0
+        );
+
+
+    $("#totalSales").text(
+        money(total)
+    );
+
+
+    $("#orders").text(
+        sales.length
+    );
+
+
+    $("#average").text(
+        money(
+            sales.length
+                ? total / sales.length
+                : 0
+        )
+    );
+
+
+
+    // PAYMENT
+
+    let payments = {
+
+        Cash: 0,
+
+        Card: 0,
+
+        Mobile: 0
+
+    };
+
+
+    sales.forEach(function (sale) {
+
+        payments[sale.payment] =
+            (payments[sale.payment] || 0)
+            + sale.total;
+
+    });
+
+
+    $("#payments").html(
+
+        Object.entries(payments)
+            .map(function (entry) {
+
+                let paymentName =
+                    entry[0];
+
+                let paymentAmount =
+                    entry[1];
+
+
+                let percentage =
+                    total
+                        ? paymentAmount / total * 100
+                        : 0;
+
+
+                return `
+
+                    <div>
+
+                        <div
+                            class="mb-1 flex justify-between text-sm">
+
+                            <span>
+                                ${paymentName}
+                            </span>
+
+                            <b>
+                                ${money(paymentAmount)}
+                            </b>
+
+                        </div>
+
+
+                        <div
+                            class="h-2 overflow-hidden rounded-full bg-slate-100">
+
+                            <div
+                                class="h-full rounded-full bg-blue-500"
+                                style="width:${percentage}%">
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            })
+            .join("")
+
+    );
+
+
+
+    // TOP PRODUCTS
+
+    let topProducts = {};
+
+
+    sales.forEach(function (sale) {
+
+        sale.items.forEach(function (item) {
+
+            topProducts[item.name] =
+                (topProducts[item.name] || 0)
+                + item.qty;
+
+        });
+
+    });
+
+
+    let sorted =
+        Object.entries(topProducts)
+            .sort(function (a, b) {
+
+                return b[1] - a[1];
+
+            })
+            .slice(0, 5);
+
+
+    $("#topProducts").html(
+
+        sorted.map(function (item, index) {
+
+            return `
+
+                <div
+                    class="flex items-center justify-between rounded-xl bg-slate-50 p-3">
+
+                    <span>
+
+                        <b class="mr-2 text-blue-600">
+
+                            #${index + 1}
+
+                        </b>
+
+                        ${item[0]}
+
+                    </span>
+
+
+                    <b>
+
+                        ${item[1]}
+                        sold
+
+                    </b>
+
+                </div>
+
+            `;
+
+        }).join("")
+
+        ||
+
+        `
+
+        <p class="text-sm text-slate-400">
+
+            No sales data for this period.
+
+        </p>
+
+        `
+
+    );
+
+}
+
+
+
+$(document).ready(function () {
+
+    let today =
+        new Date()
+            .toISOString()
+            .slice(0, 10);
+
+
+    $("#from").val(today);
+
+    $("#to").val(today);
+
+
+    generateReport();
+
+
+    $("#from, #to").on(
+        "change",
+        generateReport
+    );
+
+
+    $("#today").click(function () {
+
+        $("#from").val(today);
+
+        $("#to").val(today);
+
+        generateReport();
+
+    });
+
+
+    $("#print").click(function () {
+
+        window.print();
+
+    });
+
+});
+
+</script>
+
+</body>
+
+</html>

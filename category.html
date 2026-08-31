@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>KS7 POS - Category</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+</head>
+
+<body class="bg-slate-100 text-slate-800">
+
+<div class="flex min-h-screen">
+
+    <!-- SIDEBAR -->
+
+    <aside
+        class="fixed left-0 top-0 z-30 flex h-screen w-20 flex-col items-center border-r bg-white py-5 shadow-sm">
+
+        <div
+            class="mb-8 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-xl font-bold text-white">
+
+            K
+
+        </div>
+
+        <nav class="flex flex-col gap-3">
+
+            <a
+                href="index.html"
+                class="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100">
+
+                ▦
+
+            </a>
+
+            <a
+                href="category.html"
+                class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white">
+
+                ☷
+
+            </a>
+
+            <a
+                href="product.html"
+                class="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100">
+
+                ▤
+
+            </a>
+
+            <a
+                href="sales.html"
+                class="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100">
+
+                ▧
+
+            </a>
+
+            <a
+                href="report.html"
+                class="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100">
+
+                ▥
+
+            </a>
+
+        </nav>
+
+        <div class="mt-auto text-xs text-slate-400">
+
+            KS7<br>POS
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="ml-20 flex-1">
+
+        <header
+            class="flex h-20 items-center justify-between border-b bg-white px-7">
+
+            <div>
+
+                <h1 class="text-xl font-bold">
+                    Category
+                </h1>
+
+                <p class="text-sm text-slate-400">
+                    Manage your product categories
+                </p>
+
+            </div>
+
+            <button
+                id="addBtn"
+                class="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700">
+
+                + Add Category
+
+            </button>
+
+        </header>
+
+
+        <section class="p-6">
+
+            <div
+                class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+                <input
+                    id="search"
+                    type="text"
+                    placeholder="Search category..."
+                    class="w-full rounded-xl border-0 bg-white px-4 py-3 shadow-sm outline-none sm:w-80">
+
+            </div>
+
+
+            <div
+                id="grid"
+                class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- MODAL -->
+
+<div
+    id="modal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4">
+
+    <div
+        class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+
+        <div
+            class="mb-5 flex items-center justify-between">
+
+            <h2
+                id="modalTitle"
+                class="text-lg font-bold">
+
+                Add Category
+
+            </h2>
+
+            <button
+                id="close"
+                class="text-xl text-slate-400">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <input
+            id="name"
+            type="text"
+            placeholder="Category name"
+            class="mb-3 w-full rounded-xl border px-4 py-3 outline-none focus:border-blue-500">
+
+
+        <input
+            id="icon"
+            type="text"
+            placeholder="Icon e.g. 🍔"
+            class="mb-5 w-full rounded-xl border px-4 py-3 outline-none focus:border-blue-500">
+
+
+        <div class="flex justify-end gap-2">
+
+            <button
+                id="cancel"
+                class="rounded-xl border px-4 py-2">
+
+                Cancel
+
+            </button>
+
+            <button
+                id="save"
+                class="rounded-xl bg-blue-600 px-5 py-2 font-semibold text-white">
+
+                Save
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let categories =
+    JSON.parse(
+        localStorage.getItem("ks7_categories") || "[]"
+    );
+
+let editId = null;
+
+
+function renderCategories() {
+
+    let search =
+        $("#search").val().toLowerCase();
+
+
+    let list =
+        categories.filter(function (category) {
+
+            return category.name
+                .toLowerCase()
+                .includes(search);
+
+        });
+
+
+    let products =
+        JSON.parse(
+            localStorage.getItem("ks7_products") || "[]"
+        );
+
+
+    $("#grid").html(
+
+        list.map(function (category) {
+
+            let productCount =
+                products.filter(function (product) {
+
+                    return product.category === category.name;
+
+                }).length;
+
+
+            return `
+
+                <div
+                    class="rounded-2xl bg-white p-5 shadow-sm">
+
+                    <div
+                        class="flex items-start justify-between">
+
+                        <div
+                            class="flex h-14 w-14 items-center justify-center rounded-xl bg-blue-50 text-3xl">
+
+                            ${category.icon || "📁"}
+
+                        </div>
+
+                        <div class="flex gap-2">
+
+                            <button
+                                onclick="editCategory(${category.id})"
+                                class="rounded-lg bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-600">
+
+                                Edit
+
+                            </button>
+
+                            <button
+                                onclick="deleteCategory(${category.id})"
+                                class="rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-500">
+
+                                Delete
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <h3 class="mt-4 font-bold">
+                        ${category.name}
+                    </h3>
+
+
+                    <p class="mt-1 text-sm text-slate-400">
+
+                        ${productCount}
+                        products
+
+                    </p>
+
+                </div>
+
+            `;
+
+        }).join("")
+
+        ||
+
+        `
+
+        <div
+            class="col-span-full rounded-xl bg-white p-10 text-center text-slate-400">
+
+            No category found.
+
+        </div>
+
+        `
+
+    );
+
+}
+
+
+function openModal(category) {
+
+    editId =
+        category ? category.id : null;
+
+
+    $("#modalTitle").text(
+        editId
+            ? "Edit Category"
+            : "Add Category"
+    );
+
+
+    $("#name").val(
+        category ? category.name : ""
+    );
+
+
+    $("#icon").val(
+        category ? category.icon : "📁"
+    );
+
+
+    $("#modal")
+        .removeClass("hidden")
+        .addClass("flex");
+
+}
+
+
+function editCategory(id) {
+
+    let category =
+        categories.find(function (category) {
+
+            return category.id === id;
+
+        });
+
+
+    openModal(category);
+
+}
+
+
+function deleteCategory(id) {
+
+    let category =
+        categories.find(function (category) {
+
+            return category.id === id;
+
+        });
+
+
+    if (!confirm(
+        "Delete " + category.name + "?"
+    )) {
+
+        return;
+
+    }
+
+
+    let products =
+        JSON.parse(
+            localStorage.getItem("ks7_products") || "[]"
+        );
+
+
+    let used =
+        products.some(function (product) {
+
+            return product.category === category.name;
+
+        });
+
+
+    if (used) {
+
+        alert(
+            "Cannot delete. Products are using this category."
+        );
+
+        return;
+
+    }
+
+
+    categories =
+        categories.filter(function (category) {
+
+            return category.id !== id;
+
+        });
+
+
+    localStorage.setItem(
+        "ks7_categories",
+        JSON.stringify(categories)
+    );
+
+
+    renderCategories();
+
+}
+
+
+$(document).ready(function () {
+
+    renderCategories();
+
+
+    $("#search").on(
+        "input",
+        renderCategories
+    );
+
+
+    $("#addBtn").click(function () {
+
+        openModal();
+
+    });
+
+
+    $("#close, #cancel").click(function () {
+
+        $("#modal")
+            .addClass("hidden")
+            .removeClass("flex");
+
+    });
+
+
+    $("#save").click(function () {
+
+        let name =
+            $("#name").val().trim();
+
+        let icon =
+            $("#icon").val().trim() || "📁";
+
+
+        if (!name) {
+
+            alert(
+                "Enter category name."
+            );
+
+            return;
+
+        }
+
+
+        let exists =
+            categories.some(function (category) {
+
+                return (
+
+                    category.name.toLowerCase()
+                    ===
+                    name.toLowerCase()
+
+                    &&
+
+                    category.id !== editId
+
+                );
+
+            });
+
+
+        if (exists) {
+
+            alert(
+                "Category already exists."
+            );
+
+            return;
+
+        }
+
+
+        if (editId) {
+
+            let category =
+                categories.find(function (category) {
+
+                    return category.id === editId;
+
+                });
+
+
+            let oldName =
+                category.name;
+
+
+            category.name = name;
+
+            category.icon = icon;
+
+
+            let products =
+                JSON.parse(
+                    localStorage.getItem("ks7_products") || "[]"
+                );
+
+
+            products =
+                products.map(function (product) {
+
+                    if (product.category === oldName) {
+
+                        return {
+                            ...product,
+                            category: name
+                        };
+
+                    }
+
+                    return product;
+
+                });
+
+
+            localStorage.setItem(
+                "ks7_products",
+                JSON.stringify(products)
+            );
+
+        } else {
+
+            categories.push({
+
+                id: Date.now(),
+
+                name: name,
+
+                icon: icon
+
+            });
+
+        }
+
+
+        localStorage.setItem(
+            "ks7_categories",
+            JSON.stringify(categories)
+        );
+
+
+        $("#modal")
+            .addClass("hidden")
+            .removeClass("flex");
+
+
+        renderCategories();
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>
